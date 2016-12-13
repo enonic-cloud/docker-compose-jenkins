@@ -1,0 +1,51 @@
+apache2:
+  build: apache2
+  hostname: ci.mydomain.com
+  restart: always
+  volumes_from:
+    - letsencryptstore
+  ports:
+    - "80:80"
+    - "443:443"
+  environment:
+    LETS_ENCRYPT_EMAIL: "your@email.com"
+    LETS_ENCRYPT_DOMAINS: "yourserver.com,site2.yourserver.com"
+  labels:
+    io.enonic.backup.data: "/etc/letsencrypt,/var/lib/letsencrypt"
+letsencryptstore:
+  image: busybox
+  volumes:
+    - "/etc/letsencrypt"
+    - "/var/lib/letsencrypt"
+links:
+  - jenkins
+volumes_from:
+  - reposhare
+jenkins:
+  build: jenkins
+  ports:
+    - "8180:8080"
+  restart: always
+  labels:
+    io.enonic.backup.data: "/var/jenkins_home,/var/www/html/repo"
+  volumes_from:
+    - "jenkinsstorage"
+    - "reposhare"
+  volumes:
+    - "/var/run/docker.sock:/var/run/docker.sock"
+  links:
+    - mail
+jenkinsstorage:
+  image: jenkins
+  command: "echo jenkins storage container "
+  volumes:
+    - "/var/jenkins_home"
+reposhare:
+  image: busybox
+  command: "chown 1000 /var/www/html/repo ; echo repository storage"
+  volumes:
+    - "/var/www/html/repo"
+mail:
+  image: enoniccloud/postfix
+  hostname: ci.mydomain.com
+  restart: always
