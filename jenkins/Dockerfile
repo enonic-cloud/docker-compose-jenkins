@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.119
+FROM jenkins/jenkins:2.128
 
 # Installing docker
 USER root
