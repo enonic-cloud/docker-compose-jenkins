@@ -5,4 +5,4 @@ COPY sites /etc/apache2/sites-enabled
 RUN a2enmod proxy_wstunnel \
   && a2enmod proxy_http \
   && a2enmod rewrite \
-  && headers
+  && a2enmod headers
